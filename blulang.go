@@ -85,7 +85,7 @@ func (a Adapter) FindDevice() error {
 	return nil
 }
 
-func (a *Adapter) Testmsg() {
+func (a *Adapter) Testmsg() error {
 
 	blob, error := ioutil.ReadAll(a.shell.stdout)
 
