@@ -47,9 +47,8 @@ func (b *bluetoothctl) read(btMsg string) (string, error) {
 
 func (b *bluetoothctl) stop() error {
 
-	b.cmd.Wait()
-
 	b.write("exit")
+	b.cmd.Wait()
 
 	return nil
 }
