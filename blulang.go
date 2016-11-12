@@ -87,11 +87,12 @@ func (a Adapter) FindDevice() error {
 
 func (a *Adapter) Testmsg() error {
 
-	blob, error := ioutil.ReadAll(a.shell.stdout)
+	blob, err := ioutil.ReadAll(a.shell.stdout)
 
 	fmt.Println("t")
 	fmt.Println(string(blob))
-	fmt.Println(error)
+
+	return err
 }
 
 func (a *Adapter) Init() error {
