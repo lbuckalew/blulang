@@ -95,12 +95,11 @@ func (a *Adapter) Testmsg() {
 	fmt.Println(error)
 }
 
-func (a *Adapter) GetAdapter() (Adapter, error) {
-
+func (a *Adapter) Init() error {
 	// check for btshell
-	a.shell.start()
-
-	// enable
+	if err := a.shell.start(); err != nil {
+		return err
+	}
 
 	// get attributes from shell
 	a.Name = "Test name"
@@ -109,7 +108,7 @@ func (a *Adapter) GetAdapter() (Adapter, error) {
 	a.Pairable = false
 	a.Discovering = false
 
-	return *a, nil
+	return nil
 }
 
 func (a *Adapter) enable() error {
