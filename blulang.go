@@ -1,6 +1,7 @@
 package blulang
 
 import (
+	"bufio"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -26,6 +27,11 @@ func (b *bluetoothctl) start() error {
 	b.stdout, err = b.cmd.StdoutPipe()
 	if err != nil {
 		return err
+	}
+
+	s := bufio.NewScanner(b.stdout)
+	for s.Scan() {
+		fmt.Println(s.Text())
 	}
 
 	return b.cmd.Start()
@@ -111,8 +117,9 @@ func (a *Adapter) Init() error {
 	return nil
 }
 
-func (a *Adapter) enable() error {
+func (a *Adapter) Enable() error {
 
+	a.shell.write("power on")
 	return nil
 }
 
