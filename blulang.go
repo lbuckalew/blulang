@@ -10,24 +10,17 @@ import (
 
 type bluetoothctl struct {
 	cmd    *exec.Cmd
-	stdin  io.Writer
-	stdout io.Reader
+	stdin  io.WriteCloser
+	stdout io.ReadCloser
 }
 
 func (b *bluetoothctl) start() {
-	var err error
 
 	b.cmd = exec.Command("bluetoothctl")
 
-	b.stdin, err = b.cmd.StdinPipe()
-	if err != nil {
-		return err
-	}
+	b.stdin, _ = b.cmd.StdinPipe()
 
-	b.stdout, err = b.cmd.StdoutPipe()
-	if err != nil {
-		return err
-	}
+	b.stdout, _ = b.cmd.StdoutPipe()
 
 	s := bufio.NewScanner(b.stdout)
 
@@ -40,6 +33,7 @@ func (b *bluetoothctl) start() {
 
 func (b *bluetoothctl) write(btCmd string) error {
 
+	b.stdin.Close()
 	b.stdin.Write([]byte(btCmd))
 	b.stdin.Close()
 
@@ -105,9 +99,7 @@ func (a *Adapter) Testmsg() error {
 
 func (a *Adapter) Init() error {
 	// check for btshell
-	if err := a.shell.start(); err != nil {
-		return err
-	}
+	a.shell.start()
 
 	// get attributes from shell
 	a.Name = "Test name"
