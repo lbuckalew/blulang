@@ -14,7 +14,7 @@ type bluetoothctl struct {
 	stdout io.Reader
 }
 
-func (b *bluetoothctl) start() error {
+func (b *bluetoothctl) start() {
 	var err error
 
 	b.cmd = exec.Command("bluetoothctl")
@@ -30,16 +30,18 @@ func (b *bluetoothctl) start() error {
 	}
 
 	s := bufio.NewScanner(b.stdout)
+
+	b.cmd.Start()
+
 	for s.Scan() {
 		fmt.Println(s.Text())
 	}
-
-	return b.cmd.Start()
 }
 
 func (b *bluetoothctl) write(btCmd string) error {
 
 	b.stdin.Write([]byte(btCmd))
+	b.stdin.Close()
 
 	return nil
 }
