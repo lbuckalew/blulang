@@ -6,6 +6,7 @@ import (
 	"io"
 	"io/ioutil"
 	"os/exec"
+	"regexp"
 )
 
 type bluetoothctl struct {
@@ -14,12 +15,29 @@ type bluetoothctl struct {
 	stdout io.ReadCloser
 }
 
+type response struct {
+	kind string
+	body string
+}
+
+func NewResponse(b []byte) *response {
+	r := new(response)
+
+	if m, e := regexp.Match("^Compile", b); m && (err == nil) {
+		r.kind = "Info"
+	} else if m, e = regexp.Match("[NEW]", b); m && (err == nil) {
+		r.kind = "Device - New"
+	} else if m, e = regexp.Match("[CHG]", b); m && (err == nil) {
+		r.kind = "Device - Change"
+	}
+
+}
+
 func (b *bluetoothctl) start() {
 
 	b.cmd = exec.Command("bluetoothctl")
 
 	b.stdin, _ = b.cmd.StdinPipe()
-
 	b.stdout, _ = b.cmd.StdoutPipe()
 
 	s := bufio.NewScanner(b.stdout)
@@ -87,19 +105,10 @@ func (a Adapter) FindDevice() error {
 	return nil
 }
 
-func (a *Adapter) Testmsg() error {
-
-	blob, err := ioutil.ReadAll(a.shell.stdout)
-
-	fmt.Println("t")
-	fmt.Println(string(blob))
-
-	return err
-}
-
 func (a *Adapter) Init() error {
 	// check for btshell
 	a.shell.start()
+	a.shell.Enable()
 
 	// get attributes from shell
 	a.Name = "Test name"
@@ -111,14 +120,29 @@ func (a *Adapter) Init() error {
 	return nil
 }
 
+func (a *Adapter) GetInfo() error {
+
+}
+
 func (a *Adapter) Enable() error {
 
 	a.shell.write("power on")
 	return nil
 }
 
-func (a *Adapter) disable() error {
+func (a *Adapter) Disable() error {
 
+	a.shell.write("power off")
+	return nil
+}
+
+func (a Adapter) isEnabled() bool {
+	return true
+}
+
+func (a *Adapter) KillShell() error {
+
+	a.stop()
 	return nil
 }
 
